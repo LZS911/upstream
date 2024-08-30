@@ -64,21 +64,39 @@ jobs:
             new_pr=$(gh pr create --base main-ee --head main \
               --title "Sync main to main-ee" \
               --body "Automatically created PR to sync changes from main to main-ee")
+
+            # 获取新创建的 PR 编号
+            pr_number=$(echo $new_pr | grep -oP '#\K\d+')
+
+            echo "Created new PR $new_pr - #$pr_number"
             
-            # 发送内部消息
-            # curl -X POST $INTERNAL_API_URL \
-            #   -H "Authorization: Bearer $INTERNAL_API_TOKEN" \
-            #   -H "Content-Type: application/json" \
-            #   -d '{"message": "New PR created: main to main-ee", "pr_url": "'"$new_pr"'"}'
+            # 检查新创建的 PR 是否有冲突
+            merge_status=$(gh pr view $pr_number --json mergeable -q '.mergeable')
+
+            if [ "$merge_status" = "CONFLICTING" ]; then
+              # 创建新分支
+              new_branch="sync-main-to-main-ee-$(date +%Y%m%d%H%M%S)"
+              git checkout -b $new_branch
+              git push origin $new_branch
+              
+              # 创建新的 PR
+              new_pr=$(gh pr create --base main-ee --head $new_branch \
+                --title "Sync main to main-ee (resolved conflicts)" \
+                --body "Automatically created PR to sync changes from main to main-ee. This PR was created to resolve conflicts.")
+              
+              # 关闭旧的 PR
+              gh pr close $pr_number --comment "Closing due to conflicts. New PR created: $new_pr"
+            else
+             echo "Created new PR #$pr_number without conflicts."
             
           else
             echo "A PR from main to main-ee already exists (PR #$existing_pr). Checking for conflicts..."
             
             # 检查是否有冲突
-            conflicts=$(gh pr view $existing_pr --json mergeable | jq -r '.mergeable')
-            echo "Conflicts value: '$conflicts'"
+            merge_status=$(gh pr view $existing_pr --json mergeable -q '.mergeable')
+            echo "Conflicts value: '$merge_status'"
 
-            if [ "$conflicts" = "CONFLICTING" ]; then
+            if [ "$merge_status" = "CONFLICTING" ]; then
               echo "Conflicts detected. Creating new branch and PR..."
               
               # 创建新分支
@@ -94,11 +112,7 @@ jobs:
               # 关闭旧的 PR
               gh pr close $existing_pr --comment "Closing due to conflicts. New PR created: $new_pr"
               
-              # 发送内部消息
-              # curl -X POST $INTERNAL_API_URL \
-              #   -H "Authorization: Bearer $INTERNAL_API_TOKEN" \
-              #   -H "Content-Type: application/json" \
-              #   -d '{"message": "Conflicts detected in main to main-ee PR. New PR created to resolve conflicts.", "pr_url": "'"$new_pr"'"}'
+
             else
               echo "Existing PR has no conflicts."
             fi
