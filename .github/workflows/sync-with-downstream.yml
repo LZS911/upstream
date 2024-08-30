@@ -76,7 +76,8 @@ jobs:
             
             # 检查是否有冲突
             conflicts=$(gh pr view $existing_pr --json mergeStateStatus --jq '.mergeStateStatus')
-            
+            echo "Conflicts value: '$conflicts'"
+
             if [ "$conflicts" = "CONFLICTING" ]; then
               echo "Conflicts detected. Creating new branch and PR..."
               
