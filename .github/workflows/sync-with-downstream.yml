@@ -81,6 +81,7 @@ jobs:
               local pr_number=$1
               # 创建新分支
               new_branch="sync-main-to-main-ee-$(date +%Y%m%d%H%M%S)"
+              git checkout main
               git checkout -b $new_branch
               git push origin $new_branch
               
