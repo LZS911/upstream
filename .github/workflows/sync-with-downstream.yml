@@ -109,7 +109,7 @@ jobs:
             echo "Created new PR $new_pr - #$pr_number"
             
             # 检查新创建的 PR 是否有冲突
-            merge_status=$(check_pr_status $pr_number 5 10)
+            merge_status=$(check_pr_status $pr_number 10 10)
             echo "merge_status value: '$merge_status'"
 
             if [ "$merge_status" = "CONFLICTING" ]; then              
@@ -122,7 +122,7 @@ jobs:
             echo "A PR from main to main-ee already exists (PR #$existing_pr). Checking for conflicts..."
             
             # 检查是否有冲突
-            merge_status=$(check_pr_status $existing_pr 5 10)
+            merge_status=$(check_pr_status $existing_pr 10 10)
             echo "merge_status value: '$merge_status'"
 
             if [ "$merge_status" = "CONFLICTING" ]; then              
