@@ -75,7 +75,7 @@ jobs:
             echo "A PR from main to main-ee already exists (PR #$existing_pr). Checking for conflicts..."
             
             # 检查是否有冲突
-            conflicts=$(gh pr view $existing_pr --json mergeable)
+            conflicts=$(gh pr view $existing_pr --json mergeable | jq -r '.mergeable')
             echo "Conflicts value: '$conflicts'"
 
             if [ "$conflicts" = "CONFLICTING" ]; then
