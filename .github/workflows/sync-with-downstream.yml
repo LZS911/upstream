@@ -71,9 +71,9 @@ jobs:
             echo "Created new PR $new_pr - #$pr_number"
             
             # 检查新创建的 PR 是否有冲突
-            merge_status=$(gh pr view $pr_number --json mergeable -q '.mergeable')
+            merge_status=$(gh pr view $pr_number --json mergeable)
 
-            if [ "$merge_status" = "CONFLICTING" ]; then
+            if [ $merge_status = "{"mergeable":"CONFLICTING"}" ]; then
               # 创建新分支
               new_branch="sync-main-to-main-ee-$(date +%Y%m%d%H%M%S)"
               git checkout -b $new_branch
@@ -94,10 +94,10 @@ jobs:
             echo "A PR from main to main-ee already exists (PR #$existing_pr). Checking for conflicts..."
             
             # 检查是否有冲突
-            merge_status=$(gh pr view $existing_pr --json mergeable -q '.mergeable')
-            echo "Conflicts value: '$merge_status'"
+            merge_status=$(gh pr view $existing_pr --json mergeable)
+            echo "merge_status value: '$merge_status'"
 
-            if [ "$merge_status" = "CONFLICTING" ]; then
+            if [ $merge_status = "{"mergeable":"CONFLICTING"}" ]; then
               echo "Conflicts detected. Creating new branch and PR..."
               
               # 创建新分支
