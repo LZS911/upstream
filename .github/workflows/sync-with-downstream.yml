@@ -65,14 +65,12 @@ jobs:
 
               while [ $attempt -le $max_attempts ]; do
                   local merge_status=$(gh pr view $pr_number --json mergeable -q '.mergeable')
-                  echo "Attempt $attempt: PR status is $merge_status"
 
                   if [ "$merge_status" != "UNKNOWN" ]; then
                       echo $merge_status
                       return 0
                   fi
 
-                  echo "Status is UNKNOWN. Waiting $wait_time seconds before retry..."
                   sleep $wait_time
                   ((attempt++))
               done
@@ -125,7 +123,7 @@ jobs:
             merge_status=$(check_pr_status $existing_pr 5 10)
             echo "merge_status value: '$merge_status'"
 
-            if [ $merge_status = "{"mergeable":"CONFLICTING"}" ]; then
+            if [ "$merge_status" = "CONFLICTING" ]; then              
               echo "Conflicts detected. Creating new branch and PR..."
               
               $(create_and_close_conflicting_pr $existing_pr)
