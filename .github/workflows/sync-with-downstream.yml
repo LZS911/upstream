@@ -57,7 +57,7 @@ jobs:
           INTERNAL_API_TOKEN: ${{ secrets.INTERNAL_API_TOKEN }}
         run: |
           # 检查是否已经存在从 main 到 main-ee 的 PR
-          check_pr_status() {
+          wait_check_pr_status() {
               local pr_number=$1
               local max_attempts=$2
               local wait_time=$3
@@ -71,7 +71,6 @@ jobs:
                       return 0
                   fi
 
-                  echo "Status is UNKNOWN. Waiting $wait_time seconds before retry..."
                   sleep $wait_time
                   ((attempt++))
               done
