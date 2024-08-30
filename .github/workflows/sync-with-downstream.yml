@@ -56,7 +56,6 @@ jobs:
           INTERNAL_API_URL: ${{ secrets.INTERNAL_API_URL }}
           INTERNAL_API_TOKEN: ${{ secrets.INTERNAL_API_TOKEN }}
         run: |
-          # 检查是否已经存在从 main 到 main-ee 的 PR
           check_pr_status() {
               local pr_number=$1
               local max_attempts=$2
@@ -92,7 +91,9 @@ jobs:
               
               # 关闭旧的 PR
               gh pr close $pr_number --comment "Closing due to conflicts. New PR created: $new_pr"
+              return 0
           }
+          # 检查是否已经存在从 main 到 main-ee 的 PR
           existing_pr=$(gh pr list --base main-ee --head main --json number --jq '.[0].number')
 
           if [ -z "$existing_pr" ]; then
