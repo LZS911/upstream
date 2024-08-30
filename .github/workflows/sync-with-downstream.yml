@@ -88,6 +88,7 @@ jobs:
               gh pr close $pr_number --comment "Closing due to conflicts. New PR created: $new_pr"
             else
              echo "Created new PR #$pr_number without conflicts."
+            fi
             
           else
             echo "A PR from main to main-ee already exists (PR #$existing_pr). Checking for conflicts..."
