@@ -1,0 +1,22 @@
+name: Trigger upstream-ee Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - 'release*'
+
+jobs:
+  trigger-sync-workflow:
+    # this file will sync to sqle-ee, we only execute job on actiontech/sqle
+    if: github.repository == 'LZS911/downstream'
+    name: Create workflow dispatch on LZS911/upstream
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger upstream workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          token: ${{ secrets.DOWNSTREAM_REPO_SECRET }}
+          repo: LZS911/upstream
+          workflow: Sync with SYNC_DOWNSTREAM
+          ref: ${{ github.ref }}-ee
