@@ -6,7 +6,7 @@ import reactLogo from './assets/react.svg';
 function App() {
   const [count, setCount] = useState(1);
   const data = useMemo(() => {
-    return count - 1;
+    return count + 1;
   }, []);
   return (
     <>
