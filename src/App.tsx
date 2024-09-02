@@ -1,10 +1,13 @@
 import viteLogo from '/vite.svg';
 import './App.css';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import reactLogo from './assets/react.svg';
 
 function App() {
   const [count, setCount] = useState(1);
+  const data = useMemo(() => {
+    return count - 1;
+  }, []);
   return (
     <>
       <div>
