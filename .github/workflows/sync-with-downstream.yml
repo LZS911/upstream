@@ -94,6 +94,9 @@ jobs:
               gh pr close $pr_number --comment "Closing due to conflicts. New PR created: $new_pr"
               return 0
           }
+          set -e 
+          trap 'echo "Error occurred. Exiting..."; exit 1' ERR  # 捕获错误并退出
+
           # 检查是否已经存在从 main 到 main-ee 的 PR
           existing_pr=$(gh pr list --base main-ee --head main --json number --jq '.[0].number')
 
@@ -113,7 +116,7 @@ jobs:
             echo "merge_status value: '$merge_status'"
 
             if [ "$merge_status" = "CONFLICTING" ]; then              
-              $(create_and_close_conflicting_pr $pr_number)
+              create_and_close_conflicting_pr $pr_number || exit 1
             else
               echo "Created new PR #$pr_number without conflicts."
             fi
@@ -128,7 +131,7 @@ jobs:
             if [ "$merge_status" = "CONFLICTING" ]; then              
               echo "Conflicts detected. Creating new branch and PR..."
               
-              $(create_and_close_conflicting_pr $existing_pr)
+              create_and_close_conflicting_pr $existing_pr || exit 1
               
             else
               echo "Existing PR has no conflicts."
